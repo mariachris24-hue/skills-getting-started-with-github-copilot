@@ -104,4 +104,20 @@ def signup_for_activity(activity_name: str, email: str):
    
     # Add student
     activity["participants"].append(email)
+
     return {"message": f"Signed up {email} for {activity_name}"}
+
+
+# Remove a participant from an activity
+from fastapi import status
+
+@app.delete("/activities/{activity_name}/participants/{email}", status_code=status.HTTP_200_OK)
+def remove_participant(activity_name: str, email: str):
+    """Remove a participant from an activity by email"""
+    if activity_name not in activities:
+        raise HTTPException(status_code=404, detail="Activity not found")
+    activity = activities[activity_name]
+    if email not in activity["participants"]:
+        raise HTTPException(status_code=404, detail="Participant not found in this activity")
+    activity["participants"].remove(email)
+    return {"message": f"Removed {email} from {activity_name}"}
